@@ -202,3 +202,9 @@ bookit/
         ├── context/     # AuthContext
         └── pages/       # All pages including organizer/
 ```
+## Run with Docker (recommended)
+
+docker-compose up --build
+
+Frontend → http://localhost:5173
+Backend  → http://localhost:5000
