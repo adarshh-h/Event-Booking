@@ -4,13 +4,16 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Seeding database...");
+  // Guard: skip seeding if data already exists.
+  // This prevents wiping the database on every Docker container restart.
+  // To force a reseed, run: npx prisma migrate reset --force
+  const existingUsers = await prisma.user.count();
+  if (existingUsers > 0) {
+    console.log("⏭️  Database already seeded — skipping. (Run `npx prisma migrate reset --force` to reseed.)");
+    return;
+  }
 
-  // Clear existing data in order (children first)
-  await prisma.activityLog.deleteMany();
-  await prisma.booking.deleteMany();
-  await prisma.event.deleteMany();
-  await prisma.user.deleteMany();
+  console.log("🌱 Seeding database...");
 
   const passwordHash = await bcrypt.hash("password123", 10);
 
