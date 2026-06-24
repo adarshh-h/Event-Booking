@@ -45,44 +45,51 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero */}
-      <div className="bg-indigo-700 text-white py-12 px-4 text-center">
-        <h1 className="text-4xl font-bold mb-2">Find Your Next Event</h1>
-        <p className="text-indigo-200 text-lg">Browse, book, and experience live events near you</p>
+    <div className="min-h-screen bg-slate-50">
+      <div className="bg-[linear-gradient(135deg,_#312e81_0%,_#4338ca_45%,_#4f46e5_100%)] px-4 py-14 text-white sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-6xl text-center sm:text-left">
+          <p className="mb-3 inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1 text-sm font-medium text-indigo-100">
+            Curated experiences
+          </p>
+          <h1 className="text-3xl font-semibold sm:text-4xl lg:text-5xl">Find your next unforgettable event</h1>
+          <p className="mx-auto mt-3 max-w-2xl text-base text-indigo-100 sm:text-lg sm:mx-0">
+            Browse, book, and enjoy live events with a polished experience built for every screen size.
+          </p>
+        </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Search bar */}
-        <form onSubmit={handleSearch} className="bg-white rounded-xl shadow p-4 mb-6 flex flex-col sm:flex-row gap-3">
-          <input
-            type="text"
-            placeholder="Search events..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          />
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          />
-          <button
-            type="submit"
-            className="bg-indigo-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
-          >
-            Search
-          </button>
-          {(search || date) && (
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <form onSubmit={handleSearch} className="mb-6 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+            <input
+              type="text"
+              placeholder="Search events..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+            />
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+            />
             <button
-              type="button"
-              onClick={clearFilters}
-              className="text-gray-500 text-sm px-3 py-2 hover:text-red-500 transition"
+              type="submit"
+              className="rounded-2xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
             >
-              Clear
+              Search
             </button>
-          )}
+            {(search || date) && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="rounded-2xl px-3 py-3 text-sm text-slate-500 transition hover:bg-slate-100 hover:text-red-500"
+              >
+                Clear
+              </button>
+            )}
+          </div>
         </form>
 
         {/* Results count */}

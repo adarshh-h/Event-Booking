@@ -11,37 +11,37 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-indigo-700 text-white shadow-md">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link to="/" className="text-2xl font-bold tracking-tight hover:text-indigo-200">
+    <nav className="border-b border-indigo-800/50 bg-indigo-700 text-white shadow-sm">
+      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <Link to="/" className="text-xl font-semibold tracking-tight transition hover:text-indigo-200 sm:text-2xl">
           🎟️ BookIt
         </Link>
 
-        <div className="flex items-center gap-4 text-sm font-medium">
-          <Link to="/" className="hover:text-indigo-200">Events</Link>
+        <div className="flex flex-wrap items-center gap-2 text-sm font-medium sm:gap-3">
+          <Link to="/" className="rounded-full px-3 py-1.5 transition hover:bg-white/10">Events</Link>
 
           {!user ? (
             <>
-              <Link to="/login" className="hover:text-indigo-200">Login</Link>
-              <Link to="/signup" className="bg-white text-indigo-700 px-3 py-1.5 rounded-lg hover:bg-indigo-100">
+              <Link to="/login" className="rounded-full px-3 py-1.5 transition hover:bg-white/10">Login</Link>
+              <Link to="/signup" className="rounded-full bg-white px-3 py-1.5 text-indigo-700 transition hover:bg-indigo-100">
                 Sign Up
               </Link>
             </>
           ) : (
             <>
               {user.role === "ORGANIZER" ? (
-                <Link to="/organizer/dashboard" className="hover:text-indigo-200">
+                <Link to="/organizer/dashboard" className="rounded-full px-3 py-1.5 transition hover:bg-white/10">
                   Dashboard
                 </Link>
               ) : (
-                <Link to="/my-bookings" className="hover:text-indigo-200">
+                <Link to="/my-bookings" className="rounded-full px-3 py-1.5 transition hover:bg-white/10">
                   My Bookings
                 </Link>
               )}
-              <span className="text-indigo-300 hidden sm:inline">Hi, {user.name}</span>
+              <span className="hidden rounded-full bg-white/10 px-3 py-1.5 text-indigo-100 sm:inline">Hi, {user.name}</span>
               <button
                 onClick={handleLogout}
-                className="bg-indigo-600 border border-indigo-400 px-3 py-1.5 rounded-lg hover:bg-indigo-800"
+                className="rounded-full border border-indigo-400 bg-indigo-600 px-3 py-1.5 transition hover:bg-indigo-800"
               >
                 Logout
               </button>
