@@ -33,7 +33,10 @@ app.get("/", (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(err.status || 500).json({ message: err.message || "Internal server error" });
+});
 const startServer = async () => {
   try {
     await prisma.$connect();
@@ -46,8 +49,5 @@ const startServer = async () => {
     process.exit(1);
   }
 };
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(err.status || 500).json({ message: err.message || "Internal server error" });
-});
+
 startServer();
