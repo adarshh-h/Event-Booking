@@ -60,7 +60,7 @@ $r1 = Invoke-RestMethod -Uri "http://localhost:5000/auth/login" -Method POST -Co
 $r2 = Invoke-RestMethod -Uri "http://localhost:5000/auth/login" -Method POST -ContentType "application/json" -Body '{"email":"diana@bookit.com","password":"password123"}'
 $TOKEN1 = $r1.token
 $TOKEN2 = $r2.token
-
+# create Event with capacity 1 so we check 2 user book 1 seat at a time and copy the event id from edit event
 # Fire both simultaneously (replace EVENT_ID)
 $job1 = Start-Job -ArgumentList $TOKEN1, EVENT_ID { param($tok,$eid) try { $r = Invoke-RestMethod -Uri "http://localhost:5000/events/$eid/book" -Method POST -ContentType "application/json" -Headers @{Authorization="Bearer $tok"}; "CHARLIE: SUCCESS $($r.status)" } catch { "CHARLIE: FAILED $($_.ErrorDetails.Message)" } }
 $job2 = Start-Job -ArgumentList $TOKEN2, EVENT_ID { param($tok,$eid) try { $r = Invoke-RestMethod -Uri "http://localhost:5000/events/$eid/book" -Method POST -ContentType "application/json" -Headers @{Authorization="Bearer $tok"}; "DIANA: SUCCESS $($r.status)" } catch { "DIANA: FAILED $($_.ErrorDetails.Message)" } }
