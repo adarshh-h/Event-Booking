@@ -29,6 +29,8 @@ That's it. Docker will:
 
 > **Note:** The backend waits for Postgres to pass its health check before starting, so the first boot takes ~15 seconds.
 
+> **Fresh start:** Run `docker-compose down -v` before `docker-compose up --build` to wipe the database and reseed from scratch.
+
 ---
 
 ## Seed accounts
@@ -42,7 +44,38 @@ All seed accounts use password: `password123`
 | charlie@bookit.com  | USER      |
 | diana@bookit.com    | USER      |
 
-> **DSA Prep Workshop** (Event 4) is seeded as sold out — use it to test the concurrency guarantee.
+> **DSA Prep Workshop** is seeded as sold out — use it to test the sold-out UI state.
+
+---
+
+## Verifying the no-oversell guarantee
+
+The hardest requirement: two users booking the last seat simultaneously → exactly one succeeds.
+
+Create an event with **capacity 1** via the organizer dashboard, grab tokens for two users and fire simultaneous requests on Windows PowerShell:
+
+```powershell
+# Login both users
+$r1 = Invoke-RestMethod -Uri "http://localhost:5000/auth/login" -Method POST -ContentType "application/json" -Body '{"email":"charlie@bookit.com","password":"password123"}'
+$r2 = Invoke-RestMethod -Uri "http://localhost:5000/auth/login" -Method POST -ContentType "application/json" -Body '{"email":"diana@bookit.com","password":"password123"}'
+$TOKEN1 = $r1.token
+$TOKEN2 = $r2.token
+
+# Fire both simultaneously (replace EVENT_ID)
+$job1 = Start-Job -ArgumentList $TOKEN1, EVENT_ID { param($tok,$eid) try { $r = Invoke-RestMethod -Uri "http://localhost:5000/events/$eid/book" -Method POST -ContentType "application/json" -Headers @{Authorization="Bearer $tok"}; "CHARLIE: SUCCESS $($r.status)" } catch { "CHARLIE: FAILED $($_.ErrorDetails.Message)" } }
+$job2 = Start-Job -ArgumentList $TOKEN2, EVENT_ID { param($tok,$eid) try { $r = Invoke-RestMethod -Uri "http://localhost:5000/events/$eid/book" -Method POST -ContentType "application/json" -Headers @{Authorization="Bearer $tok"}; "DIANA: SUCCESS $($r.status)" } catch { "DIANA: FAILED $($_.ErrorDetails.Message)" } }
+Start-Sleep 3
+Receive-Job $job1
+Receive-Job $job2
+```
+
+Expected output:
+```
+CHARLIE: SUCCESS CONFIRMED
+DIANA:   FAILED {"message":"Event sold out"}
+```
+
+Exactly one succeeds, one gets 409. See `NOTES.md` for how this is enforced.
 
 ---
 
@@ -109,26 +142,6 @@ npm run dev
 Frontend runs at `http://localhost:5173`
 
 </details>
-
----
-
-## Verifying the no-oversell guarantee
-
-The hardest requirement: two users booking the last seat simultaneously → exactly one succeeds.
-
-The seeded **DSA Prep Workshop** has 0 seats remaining. To test a fresh race condition, create an event with capacity 1 via the organizer dashboard, grab tokens for two different users, then:
-
-```bash
-curl -s -X POST http://localhost:5000/events/EVENT_ID/book \
-  -H "Authorization: Bearer USER1_TOKEN" \
-  -H "Content-Type: application/json" &
-
-curl -s -X POST http://localhost:5000/events/EVENT_ID/book \
-  -H "Authorization: Bearer USER2_TOKEN" \
-  -H "Content-Type: application/json"
-```
-
-Expected: exactly one `201 Created`, one `409 Event sold out`. See `NOTES.md` for how this is enforced.
 
 ---
 
