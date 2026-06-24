@@ -40,14 +40,8 @@ export const bookEvent = async (req, res) => {
           throw new Error("SOLD_OUT");
         }
 
-        await tx.activityLog.create({
-          data: {
-            eventId,
-            userId,
-            action: "BOOKING_STARTED",
-          },
-        });
-
+        // Re-booking a cancelled seat — don't log BOOKING_STARTED again,
+        // it was already counted on the original booking attempt.
         const updated = await tx.booking.update({
           where: {
             id: existingBooking.id,
