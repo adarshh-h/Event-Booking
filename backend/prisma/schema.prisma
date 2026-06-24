@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ORGANIZER
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+enum ActivityType {
+  EVENT_VIEWED
+  BOOKING_STARTED
+  BOOKING_CONFIRMED
+  BOOKING_CANCELLED
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+
+  events    Event[]  @relation("OrganizerEvents")
+  bookings  Booking[]
+  logs      ActivityLog[]
+
+  createdAt DateTime @default(now())
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  venue       String
+  eventDate   DateTime
+  capacity    Int
+  price       Float
+
+  organizerId Int
+  organizer   User @relation("OrganizerEvents", fields: [organizerId], references: [id])
+
+  bookings    Booking[]
+  logs        ActivityLog[]
+
+  createdAt   DateTime @default(now())
+
+  @@index([title])
+  @@index([eventDate])
+}
+
+model Booking {
+  id        Int      @id @default(autoincrement())
+
+  userId    Int
+  eventId   Int
+
+  user      User @relation(fields: [userId], references: [id])
+  event     Event @relation(fields: [eventId], references: [id])
+
+  status    BookingStatus @default(CONFIRMED)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, eventId])
+}
+
+model ActivityLog {
+  id        Int      @id @default(autoincrement())
+
+  eventId   Int
+  userId    Int?
+
+  event     Event @relation(fields: [eventId], references: [id])
+  user      User? @relation(fields: [userId], references: [id])
+
+  action    ActivityType
+
+  createdAt DateTime @default(now())
+}
